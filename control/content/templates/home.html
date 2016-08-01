@@ -1,0 +1,207 @@
+<div id="carousel"></div>
+<hr class="none">
+<div class="item clearfix row">
+  <div class="labels col-md-3 padding-right-zero pull-left">
+    <span>Text</span>
+  </div>
+</div>
+<hr class="none">
+<div class="item clearfix row">
+  <div class="main col-md-12 pull-left">
+        <textarea id="text" rows="5" width="100%" class="form-control"
+                  ui-tinymce="ContentHome.descriptionWYSIWYGOptions"
+                  ng-model="ContentHome.data.content.description"
+                  placeholder="WYSIWYG"></textarea>
+  </div>
+</div>
+<div class="item clearfix row margin-top-thirty" data-ng-show="ContentHome.csvDataInvalid">
+  <div class="labels col-md-12">
+    <div class="alert alert-warning">
+      <a href="javascript:void(0)" class="close" data-ng-click="ContentHome.csvDataInvalid=false">×</a>
+      <strong>Note!</strong>Uploaded CSV file data is either incomplete or is not a CSV file.
+    </div>
+  </div>
+</div>
+<hr class="none">
+<div class="item clearfix row">
+  <div class="col-md-2 labels pull-left margin-top-five">
+    <span>Bulk Actions</span>
+  </div>
+  <div class="col-md-10 pull-left row padding-right-zero">
+    <div class="col-xs-4 pull-left padding-right-zero">
+      <a class="btn btn-primary stretch" ng-click="ContentHome.openImportCSVDialog()">Import CSV</a>
+    </div>
+    <div class="col-xs-4 pull-left padding-right-zero">
+      <a class="btn btn-primary stretch"  ng-click="ContentHome.exportCSV()">Export CSV</a>
+    </div>
+    <div class="col-xs-4 pull-left padding-right-zero">
+      <a class="btn btn-primary stretch" ng-click="ContentHome.getTemplate()">Get Template</a>
+    </div>
+  </div>
+</div>
+<div class="header clearfix">
+  <h4 class="margin-zero">Filters</h4>
+</div>
+<div class="item clearfix row">
+  <div class="col-md-1 labels pull-left margin-top-five">
+    <span>Sort</span>
+  </div>
+  <div class="col-md-5 pull-left">
+    <div class="dropdown" dropdown>
+      <button class="btn btn-default text-left dropdown-toggle"
+              data-toggle="dropdown" dropdown-toggle aria-expanded="true">
+        <span class="pull-left">{{ContentHome.data.content.sortFilterBy || ContentHome.sortFilterOptions[0]}}</span>
+        <span class="chevron icon-chevron-down pull-right"></span>
+      </button>
+      <ul class="dropdown-menu extended" role="menu">
+        <li ng-repeat="value in ContentHome.sortFilterOptions"
+            ng-click="ContentHome.sortFilterBy(this.value)">
+          <a tabindex="-1" class="transition-third">{{value}}</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="col-md-3 padding-zero pull-left">
+    <a class="btn btn-success stretch" ng-click="ContentHome.addEditFilter(null , false)">Add New Filter</a>
+  </div>
+</div>
+<hr class="none">
+<div class="infinite-scroll-parent" ng-style="ContentHome.filters.length>4? {'height': '282px'}:{'height':'100%'}" style=";overflow-y: auto;">
+ <div ui-sortable="ContentHome.filterSortableOptions"  ng-model="ContentHome.filters" class="draggable-list-view wide-list no-media has-btn-link"
+     style="background:#fff;"
+     infinite-scroll='ContentHome.loadMore("html")'
+     infinite-scroll-distance='1'
+     data-infinite-container=".infinite-scroll-parent"
+     infinite-scroll-disabled="ContentHome.noMoreFilter">
+   <!--{{ContentHome.filters}}-->
+  <div class="d-item square-icon clearfix" ng-repeat="filter in ContentHome.filters">
+    <span class="icon icon-menu pull-left cursor-grab"></span>
+
+    <div class="copy pull-right">
+      <div class="col-md-4 padding-zero pull-left">
+        <span class="title ellipsis pull-left">{{filter.data.title}}</span>
+      </div>
+      <div class="col-md-6 padding-right-zero pull-left">
+        <span class="title ellipsis">Includes {{filter.data.noOfItems || 0}} Items</span>
+      </div>
+      <div class="pull-right">
+        <span class="btn-icon btn-edit-icon btn-primary" ng-click="ContentHome.addEditFilter(filter, true , $index)"></span>
+        <span class="btn-icon btn-delete-icon btn-danger" ng-click="ContentHome.deleteFilter($index)"></span>
+      </div>
+    </div>
+  </div>
+ </div>
+</div>
+<div class="header clearfix">
+  <h4 class="margin-zero">Items</h4>
+</div>
+<div class="item clearfix row">
+  <div class="col-md-1 labels pull-left margin-top-five">
+    <span>Filter</span>
+  </div>
+  <div class="col-md-6 padding-right-zero pull-left">
+    <div class="dropdown" dropdown>
+      <button class="btn btn-default text-left dropdown-toggle"
+              data-toggle="dropdown" dropdown-toggle aria-expanded="true">
+        <span class="pull-left" ng-if="!ContentHome.data.content.selectedFilter.title">All Categories</span>
+
+        <span class="pull-left" ng-if="ContentHome.data.content.selectedFilter.title"> {{ContentHome.data.content.selectedFilter.title}}</span>
+        <span class="chevron icon-chevron-down pull-right"></span>
+      </button>
+      <ul class="dropdown-menu extended" role="menu">
+        <li ng-click="ContentHome.chooseFilter('All Categories')"><a>All Categories</a></li>
+        <li ng-repeat="filter in ContentHome.filters"  ng-click="ContentHome.chooseFilter(filter.id, filter.data.title)"><a>{{filter.data.title}}</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="col-md-4 pull-left">
+    <div class="dropdown" dropdown>
+      <button class="btn btn-default text-left dropdown-toggle"
+              data-toggle="dropdown" dropdown-toggle aria-expanded="true">
+        <span class="pull-left" ng-if="!ContentHome.data.content.selectedStatus">All Statuses</span>
+        <span class="pull-left" ng-if="ContentHome.data.content.selectedStatus"> {{ContentHome.data.content.selectedStatus}}</span>
+        <span class="chevron icon-chevron-down pull-right"></span>
+      </button>
+      <ul class="dropdown-menu extended" role="menu">
+        <li><a  ng-click="ContentHome.chooseStatus('All Statuses')">All Statuses</a></li>
+        <li><a ng-click="ContentHome.chooseStatus('Active')">Active</a></li>
+        <li><a ng-click="ContentHome.chooseStatus('Expired')">Expired</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+<hr class="none">
+<div class="item clearfix row">
+  <div class="col-md-1 labels pull-left margin-top-five"></div>
+  <div class="col-md-8 padding-right-zero pull-left">
+    <input type="text" class="form-control"
+           placeholder="Search item name or summary"
+        ng-model = 'ContentHome.searchValue'>
+  </div>
+  <div class="col-md-3 pull-left">
+    <a class="btn btn-primary stretch" ng-click="ContentHome.searchItem()">Search</a>
+  </div>
+</div>
+<hr class="none">
+<div class="item clearfix row">
+  <div class="col-md-1 labels pull-left margin-top-five">
+    <span>Sort</span>
+  </div>
+  <div class="col-md-6 pull-left">
+    <div class="dropdown" dropdown>
+      <button class="btn btn-default text-left dropdown-toggle"
+              data-toggle="dropdown" dropdown-toggle aria-expanded="true">
+        <span class="pull-left">{{ContentHome.data.content.sortItemBy || ContentHome.sortItemOptions[0]}}</span>
+        <span class="chevron icon-chevron-down pull-right"></span>
+      </button>
+      <ul class="dropdown-menu extended" role="menu">
+        <li ng-repeat="value in ContentHome.sortItemOptions"
+            ng-click="ContentHome.sortItemBy (this.value)"><a>{{value}}</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="col-md-3 padding-zero pull-left">
+    <a class="btn btn-success stretch" href="#/item">Add New Item</a>
+  </div>
+</div>
+<hr class="none">
+<div class="infinite-scroll-parent-items" ng-style="ContentHome.items.length>9? {'height': '450px'}:{'height':'100%'}"  style="min-height: 250px;overflow-y: auto;">
+<div ui-sortable="ContentHome.itemSortableOptions" ng-model="ContentHome.items"
+     infinite-scroll='ContentHome.loadMoreItems("html")'
+      infinite-scroll-distance='1'
+      data-infinite-container=".infinite-scroll-parent-items"
+      infinite-scroll-disabled="ContentHome.noMore"
+      class="draggable-list-view wide-list has-btn links-list" >
+  <div class="well text-center margin-bottom-zero border-none" ng-if="!ContentHome.items.length">
+    <p class="margin-zero">No items found.</p>
+  </div>
+  <div class="d-item double-line square-icon clearfix" ng-repeat="item in ContentHome.items">
+    <span class="icon icon-menu pull-left cursor-grab-item"></span>
+
+    <div class="media-holder pull-left">
+      <img  ng-if="item.data.listImage" ng-src="{{item.data.listImage}}">
+      <img ng-if="!item.data.listImage" src="../../../../styles/media/holder-1x1.png">
+    </div>
+    <div class="copy pull-right">
+      <div class="col-md-4 padding-zero pull-left">
+        <a class="text-primary" href="#/item/{{item.id}}"><span
+            class="title ellipsis pull-left" >{{item.data.title}}</span></a>
+        <span class="title ellipsis pull-left" >{{item.data.summary}}</span>
+      </div>
+      <div class="col-md-3 padding-right-zero pull-left">
+        <span class="title pull-left ellipsis">Included in <br><a
+            class="text-primary" ng-click="ContentHome.showFilter($index, item.id, item.data.SelectedCategories, item.data.Categories, item.data)">{{item.SelectedCommonCategories.length || 0}} Category(s)</a></span>
+      </div>
+      <div class="col-md-3 pull-left padding-right-zero">
+        <span
+            class="title pull-left ellipsis" ng-show="item.data.expiresOn!=''" ng-class="{'expired-item' : (ContentHome.currentDateTimestamp - item.data.expiresOn) > 1}">Expires On<br>{{item.data.expiresOn | date :'mediumDate'}}</span>
+        <span
+            class="title pull-left ellipsis" ng-hide="item.data.expiresOn!=''">Expires On<br>No Expiration</span>
+      </div>
+      <div class="col-xs-2 pull-right padding-right-zero text-right">
+        <span class="btn-icon btn-delete-icon btn-danger" ng-click="ContentHome.deleteItem($index)"></span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
